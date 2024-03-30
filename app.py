@@ -7,7 +7,7 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, LocationMessage
+    MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage
 )
 
 import csv
@@ -89,12 +89,34 @@ def handle_location_message(event):
 # 處理文本消息的事件處理器
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
-    # 無論收到什麼文本消息，都提示用戶分享位置
-    reply_message = "請點選左下角加號並分享位置資訊給我!"
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply_message)
-    )
+    if event.message.text == "flex":
+        bubble_string = {
+            "type": "bubble",
+            "body": {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": "Hello,"
+                    },
+                    {
+                        "type": "text",
+                        "text": "World!"
+                    }
+                ]
+            }
+        }
+        line_bot_api.reply_message(event.reply_token,
+                                   FlexSendMessage(alt_text="Test Flex", contents=bubble_string))
+    else:
+
+        # 無論收到什麼文本消息，都提示用戶分享位置
+        reply_message = "請點選左下角加號並分享位置資訊給我!"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_message)
+        )
 
 
 # 啟動 Flask 應用
